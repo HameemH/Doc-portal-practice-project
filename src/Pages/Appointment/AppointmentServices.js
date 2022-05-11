@@ -1,7 +1,9 @@
 import React from 'react';
 
 const AppointmentServices = (props) => {
-    const{name, slots} = props.service
+    const {setAppointment, service} = props;
+
+    const{name, slots} = service;
     console.log(name);
     return (
         <div class="card w-96 bg-base-100 shadow-xl">
@@ -12,7 +14,7 @@ const AppointmentServices = (props) => {
         }</p>
     <p>{slots.length} slots available</p>
     <div class="card-actions justify-center">
-      <button disabled={slots.length===0} class="btn btn-secondary text-white ">Book Appointment</button>
+      <label for="appointment-modal" onClick={()=>setAppointment(service)} disabled={slots.length===0} class="btn btn-secondary text-white ">Book Appointment</label>
     </div>
   </div>
 </div>
