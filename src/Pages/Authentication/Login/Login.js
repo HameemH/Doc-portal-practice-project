@@ -1,12 +1,30 @@
 import React from 'react';
 import auth from './../../../firebase.init';
-import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useForm } from "react-hook-form";
+import Loading from '../../Shared/Loading';
 
 const Login = () => {
-    const [signInWithGoogle, user, loading, error] = useSignInWithGoogle(auth);
+    const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
-    const onSubmit = data => console.log(data);
+    const [
+        signInWithEmailAndPassword,
+        user,
+        loading,
+        error,
+      ] = useSignInWithEmailAndPassword(auth);
+      let signInerror;
+      if(loading || googleLoading){
+        return <Loading></Loading>
+      }
+      if(error|| googleError){
+          signInerror= <p className='text-red-500'>{error?.message} {googleError?.message}</p>
+      }
+    
+    const onSubmit = data => {
+       signInWithEmailAndPassword(data.email, data.password)
+        console.log(data)
+    };
 
     return (
         <div className='flex h-screen justify-center items-center'>
@@ -33,11 +51,14 @@ const Login = () => {
                               })}
                             className="input input-bordered w-full max-w-xs" />
                             {errors.email?.type === 'required' && <label class="label">
-                                <span class="label-text-alt">{errors.email.message}</span>
+                                <span class="label-text-alt text-red-700">{errors.email.message}</span>
                             </label>}
                             {errors.email?.type === 'pattern' && <label class="label">
-                                <span class="label-text-alt">{errors.email.message}</span>
+                                <span class="label-text-alt text-red-700">{errors.email.message}</span>
                             </label>}
+                            <label class="label">
+                                <span class="label-text">Password</span>
+                            </label>
                             <input 
                             type="passowrd"
                             placeholder="Password"
@@ -51,15 +72,17 @@ const Login = () => {
                                     message: 'Password Should contain 6 characters' // JS only: <p>error message</p> TS only support string
                                   }
                               })}
-                            class="input input-bordered w-full max-w-xs mt-5" />
+                            class="input input-bordered w-full max-w-xs " />
                             {errors.password?.type === 'required' && <label class="label">
-                                <span class="label-text-alt">{errors.email.message}</span>
+                                <span class="label-text-alt text-red-700">{errors.password.message}</span>
                             </label>}
                             {errors.password?.type === 'minLength' && <label class="label">
-                                <span class="label-text-alt">{errors.email.message}</span>
+                                <span class="label-text-alt text-red-700">{errors.password.message}</span>
                             </label>}
+                            {signInerror}
                         </div>
-                        <input className='btn w-full mt-5 btn-accent max-w-xs ' type="submit" />
+                       
+                        <input className='btn w-full mt-5 btn-accent max-w-xs ' type="submit" value="LOGIN" />
                     </form>
                     <div className="divider">OR</div>
                     <button className="btn btn-outline btn-accent" onClick={() => signInWithGoogle()}>CONTINUE WITH GOOGLE</button>
