@@ -1,19 +1,47 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import auth from './../../firebase.init';
+import { toast } from 'react-toastify';
+import { async } from '@firebase/util';
 
 const AppointmentModal = ({ appointment, date ,setAppointment}) => {
-    const {name, slots} =appointment;
-   const handleBooking = e =>{
+    const {name, slots,_id} =appointment;
+    const [user] =useAuthState(auth);
+    const formattedDate = format(date,"PP")
+    console.log(user);
+   const handleBooking =async e =>{
        e.preventDefault()
-       const treatment = appointment.name
-       const slot =e.target.slot.value
-       const name =e.target.name.value
-       const email =e.target.email.value
-       const phone =e.target.phone.value
-       const bookingInfo ={slot,name,email, phone,treatment};
-       console.log(bookingInfo);
-       setAppointment(null)
+       const treatment = appointment.name;
+       const slot =e.target.slot.value;
+       const name =user?.displayName;
+       const email =user?.email;
+       const phone =e.target.phone.value;
+       const bookingInfo ={
+           treatmentId:_id,
+           treatment:treatment,
+           date:formattedDate,
+           slot,
+           name,
+           email,
+           phone
+       };
+       
+      await fetch("http://localhost:5000/bookings",{
+           method: "POST",
+           headers:{
+              "content-type": "application/json"
+           },
+           body: JSON.stringify(bookingInfo),
+       })
+       .then(res => res.json())
+       .then(data=>{
+        setAppointment(null)
+        console.log(data);
+        toast("Appointment Booked Successfully")
+       })
    }
+
     return (
         <div>
             <input type="checkbox" id="appointment-modal" className="modal-toggle" />
@@ -25,12 +53,12 @@ const AppointmentModal = ({ appointment, date ,setAppointment}) => {
                         <input type="text" disabled value={format(date, "PP")} className="input input-bordered w-full max-w-xs" />
                         <select name="slot" className="select select-bordered w-full max-w-xs">
                             {
-                                slots.map(slot =><option value={slot}>{slot}</option>)
+                                slots?.map(slot =><option value={slot}>{slot}</option>)
                             }
                             
                         </select>
-                        <input type="text" placeholder="Your name" name="name" className="input input-bordered w-full max-w-xs" />
-                        <input type="text" placeholder="Your Email" name='email' className="input input-bordered w-full max-w-xs" />
+                        <input type="text" placeholder="Your name" value={user?.displayName || ''}  name="name" disabled className="input input-bordered w-full max-w-xs" />
+                        <input type="text" placeholder="Your Email" name='email' value={user?.email || ''} disabled className="input input-bordered w-full max-w-xs" />
                         <input type="text" placeholder="Your Phone" name='phone' className="input input-bordered w-full max-w-xs" />
                         <input type="submit" placeholder="" value='Submit' className="btn btn-accent w-full max-w-xs" />
                     </form>
