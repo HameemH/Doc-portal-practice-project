@@ -10,7 +10,7 @@ const AppointmentServices = (props) => {
   <div className="card-body">
     <h2 className="card-title text-secondary">{name}</h2>
     <p>{
-        slots.length? <span>{slots[0]}</span>: <span className='text-red-500'>No slots Available</span>
+        slots?.length? <span>{slots[0]}</span>: <span className='text-red-500'>No slots Available</span>
         }</p>
     <p>{slots.length} slots available</p>
     <div className="card-actions justify-center">

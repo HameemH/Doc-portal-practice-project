@@ -1,39 +1,62 @@
 import React from 'react';
-import auth from './../../../firebase.init';
-import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
 import { useForm } from "react-hook-form";
-import Loading from '../../Shared/Loading';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import auth from './../../firebase.init';
+import Loading from './../Shared/Loading';
 
-const Login = () => {
+const Registration = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
     const { register, formState: { errors }, handleSubmit } = useForm();
     const [
-        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
         user,
         loading,
         error,
-      ] = useSignInWithEmailAndPassword(auth);
+      ] = useCreateUserWithEmailAndPassword(auth);
+      const [updateProfile, updating, updateError] = useUpdateProfile(auth);
+      const navigate = useNavigate()
+    
       let signInerror;
-      if(loading || googleLoading){
+      if(loading || googleLoading || updating){
         return <Loading></Loading>
       }
-      if(error|| googleError){
+      if(error|| googleError || updateError){
           signInerror= <p className='text-red-500'>{error?.message} {googleError?.message}</p>
       }
     
-    const onSubmit = data => {
-       signInWithEmailAndPassword(data.email, data.password)
+    const onSubmit =async (data)  => {
+        await createUserWithEmailAndPassword(data.email, data.password)
+        await updateProfile({ displayName:data.name });
+
         console.log(data)
+        navigate('/apponintment')
     };
 
     return (
         <div className='flex h-screen justify-center items-center'>
             <div className="card w-96 bg-base-100 shadow-xl">
                 <div className="card-body">
-                    <h2 className="text-center font-semibold text-xl">LOGIN</h2>
+                    <h2 className="text-center font-semibold text-xl">REGISTER</h2>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div class="form-control w-full max-w-xs">
+                            <label class="label">
+                                <span class="label-text">Name</span>
+                            </label>
+                            <input 
+                            type="text"
+                            placeholder="Your Name"
+                            {...register("name", {
+                                required:{
+                                   value:true,
+                                   message:"Name is Requried"     
+                                },
+                              })}
+                            className="input input-bordered w-full max-w-xs" />
+                            {errors.name?.type === 'required' && <label class="label">
+                                <span class="label-text-alt text-red-700">{errors.name.message}</span>
+                            </label>}
+                           
                             <label class="label">
                                 <span class="label-text">Email</span>
                             </label>
@@ -83,9 +106,9 @@ const Login = () => {
                             {signInerror}
                         </div>
                        
-                        <input className='btn w-full mt-5 btn-accent max-w-xs ' type="submit" value="LOGIN" />
+                        <input className='btn w-full mt-5 btn-accent max-w-xs ' type="submit" value="REGISTER" />
                     </form>
-                    <p>New to doctors portal? <Link to='/register' className="text-primary" >Create New Account</Link></p>
+                    <p>Already Have An Account? <Link to='/login' className="text-primary" >Please Login</Link></p>
                     <div className="divider">OR</div>
                     <button className="btn btn-outline btn-accent" onClick={() => signInWithGoogle()}>CONTINUE WITH GOOGLE</button>
 
@@ -95,4 +118,5 @@ const Login = () => {
     );
 };
 
-export default Login;
+
+export default Registration;

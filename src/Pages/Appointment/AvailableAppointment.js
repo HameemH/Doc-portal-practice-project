@@ -10,7 +10,10 @@ const AvailableAppointment = ({date}) => {
     useEffect(()=>{
         fetch('http://localhost:5000/services')
         .then(res=>res.json())
-        .then(data=>setServices(data))
+        .then(data=>{
+            setServices(data)
+            console.log(data);
+        })
     },[])
     return (
         <div className='lg:mx-10'>
