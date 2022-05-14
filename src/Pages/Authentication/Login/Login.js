@@ -3,7 +3,7 @@ import auth from './../../../firebase.init';
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useForm } from "react-hook-form";
 import Loading from '../../Shared/Loading';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
@@ -14,12 +14,18 @@ const Login = () => {
         loading,
         error,
       ] = useSignInWithEmailAndPassword(auth);
+      const location = useLocation();
+      const navigate = useNavigate()
+      let from = location.state?.from?.pathname || "/";
       let signInerror;
       if(loading || googleLoading){
         return <Loading></Loading>
       }
       if(error|| googleError){
           signInerror= <p className='text-red-500'>{error?.message} {googleError?.message}</p>
+      }
+      if(user || googleUser){
+        navigate(from, { replace: true });
       }
     
     const onSubmit = data => {
