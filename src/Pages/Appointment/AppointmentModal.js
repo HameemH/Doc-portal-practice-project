@@ -9,7 +9,6 @@ const AppointmentModal = ({ appointment, date ,setAppointment}) => {
     const {name, slots,_id} =appointment;
     const [user] =useAuthState(auth);
     const formattedDate = format(date,"PP")
-    console.log(user);
    const handleBooking =async e =>{
        e.preventDefault()
        const treatment = appointment.name;
@@ -36,9 +35,17 @@ const AppointmentModal = ({ appointment, date ,setAppointment}) => {
        })
        .then(res => res.json())
        .then(data=>{
+        console.log(data);
+        if(data.success == true){
+            toast(`Appointment Booked Successfully on ${formattedDate} at ${slot} `)
+
+        }
+       else{
+           toast(`You have already an appointment on ${data?.exists.date} for ${data?.exists.treatment} `)
+       }
         setAppointment(null)
         console.log(data);
-        toast("Appointment Booked Successfully")
+
        })
    }
 

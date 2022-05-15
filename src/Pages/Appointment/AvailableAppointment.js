@@ -6,13 +6,12 @@ import AppointmentModal from './AppointmentModal';
 const AvailableAppointment = ({date}) => {
     const [services,setServices] = useState([])
     const [appointment, setAppointment] = useState(null);
-    console.log(services);
     useEffect(()=>{
         fetch('http://localhost:5000/services')
         .then(res=>res.json())
         .then(data=>{
             setServices(data)
-            console.log(data);
+            
         })
     },[])
     return (
