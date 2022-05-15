@@ -7,7 +7,7 @@ const Footer = () => {
             background: `url(${footer})`,
             backgroundSize: 'cover'
         }} className="py-40">
-            <div className='footer lg:mx-10'>
+            <div className='footer lg:px-10'>
                 <div>
                     <span className="footer-title">Services</span>
                     <a className="link link-hover">Branding</a>
