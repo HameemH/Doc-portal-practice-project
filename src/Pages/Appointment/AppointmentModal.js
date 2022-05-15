@@ -5,7 +5,7 @@ import auth from './../../firebase.init';
 import { toast } from 'react-toastify';
 import { async } from '@firebase/util';
 
-const AppointmentModal = ({ appointment, date ,setAppointment}) => {
+const AppointmentModal = ({ appointment, date ,setAppointment,refetch}) => {
     const {name, slots,_id} =appointment;
     const [user] =useAuthState(auth);
     const formattedDate = format(date,"PP")
@@ -43,6 +43,7 @@ const AppointmentModal = ({ appointment, date ,setAppointment}) => {
        else{
            toast(`You have already an appointment on ${data?.exists.date} for ${data?.exists.treatment} `)
        }
+        refetch()
         setAppointment(null)
         console.log(data);
 
