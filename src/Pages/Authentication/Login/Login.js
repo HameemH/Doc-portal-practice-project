@@ -1,9 +1,12 @@
-import React from 'react';
 import auth from './../../../firebase.init';
 import { useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { useForm } from "react-hook-form";
 import Loading from '../../Shared/Loading';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React,{useEffect} from 'react';
+
+import Usetoken from './../../Hooks/Usetoken';
+
 
 const Login = () => {
     const [signInWithGoogle, googleUser, googleLoading, googleError] = useSignInWithGoogle(auth);
@@ -16,22 +19,28 @@ const Login = () => {
       ] = useSignInWithEmailAndPassword(auth);
       const location = useLocation();
       const navigate = useNavigate()
+      const [token]  = Usetoken(user || googleUser);
+
       let from = location.state?.from?.pathname || "/";
       let signInerror;
+      useEffect( () =>{
+        if (token) {
+            navigate(from, { replace: true });
+        }
+    }, [token, from, navigate])
       if(loading || googleLoading){
         return <Loading></Loading>
       }
       if(error|| googleError){
           signInerror= <p className='text-red-500'>{error?.message} {googleError?.message}</p>
       }
-      if(user || googleUser){
-        navigate(from, { replace: true });
-      }
+   
     
     const onSubmit = data => {
        signInWithEmailAndPassword(data.email, data.password)
         console.log(data)
     };
+   
 
     return (
         <div className='flex h-screen justify-center items-center'>
